@@ -1,0 +1,23 @@
+# os, lang
+node_modules/
+.venv/
+__pycache__/
+.DS_Store
+
+# env
+.claude/
+logs/
+utils/
+ide/
+database/
+configs/
+
+# projects
+projects/*
+!projects/*.sh
+!projects/README.md
+
+# private
+_docs/
+.env
+!.env.sample

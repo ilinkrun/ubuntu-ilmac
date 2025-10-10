@@ -1,0 +1,30 @@
+{
+  "window.zoomLevel": 1.5,
+  "editor.fontSize": 16,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "[markdown]": {
+    "editor.defaultFormatter": null,
+    "editor.formatOnSave": false,
+    "editor.formatOnPaste": false,
+    "editor.formatOnType": false
+  },
+  "prettier.enable": false,
+  "markdown.extension.print.absoluteImgPath": false,
+  "markdown.extension.toc.unorderedList.marker": "-",
+  "markdown.extension.tableFormatter.enabled": false,
+  "markdown.validate.enabled": false, 
+  "[python]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+  "[javascript]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+  "[typescript]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  }
+}

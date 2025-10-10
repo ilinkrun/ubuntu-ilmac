@@ -1,0 +1,95 @@
+version: '3.8'
+
+# Development environment overrides
+services:
+  # Auth Service - Development Mode
+  auth-service:
+    build:
+      context: ../infrastructure/auth-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ../infrastructure/auth-service:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - HOT_RELOAD=true
+    ports:
+      - "3001:3000"
+      - "9229:9229"  # Node.js debugger
+
+  # Database Service - Development Mode
+  database-service:
+    build:
+      context: ../infrastructure/database-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ../infrastructure/database-service:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "3002:3000"
+
+  # API Gateway - Development Mode
+  api-gateway:
+    build:
+      context: ../infrastructure/api-gateway
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ../infrastructure/api-gateway:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "3000:3000"
+
+  # Management Hub Frontend - Development Mode
+  management-hub-frontend:
+    build:
+      context: ../management-hub/frontend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ../management-hub/frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - FAST_REFRESH=true
+    ports:
+      - "3003:3000"
+
+  # Management Hub Backend - Development Mode
+  management-hub-backend:
+    build:
+      context: ../management-hub/backend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ../management-hub/backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "3004:3000"
+
+  # PostgreSQL with development settings
+  postgres:
+    environment:
+      - POSTGRES_DB=dev_metadata
+      - POSTGRES_USER=dev_user
+      - POSTGRES_PASSWORD=dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ../infrastructure/shared-database/postgresql/init:/docker-entrypoint-initdb.d
+
+  # Redis with development settings
+  redis:
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+
+volumes:
+  postgres_dev_data:
+  redis_dev_data:
