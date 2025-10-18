@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  ubuntu-ilmac:
+    container_name: ubuntu-ilmac
+    image: ilmac-ubuntu-dev:latest
+    restart: unless-stopped
+    ports:
+      # SSH (Platform-level, single port per platform)
+      - "${PLATFORM_SSH_PORT}:22"
+      - "${PLATFORM_PORT_START}-${PLATFORM_PORT_END}:${PLATFORM_PORT_START}-${PLATFORM_PORT_END}"
+    volumes:
+      # NAS 전체 볼륨을 /nas에 마운트
+      - "${NAS_ROOT_LOCAL}:${NAS_ROOT_DOCKER}"
+      # 현재 디렉토리를 /exposed에 마운트 (Claude Code 호환성)
+      - "${CURRENT_DIR_LOCAL}:${CURRENT_DIR_DOCKER}"
+      # Chrome
+      - "${CHROME_EXECUTABLE_PATH_LOCAL}:${CHROME_EXECUTABLE_FOLDER_DOCKER}"
+      - "${CHROME_USERDATA_PATH_LOCAL}:${CHROME_USERDATA_PATH_DOCKER}"
+      - "${CHROME_FONTS_PATH_LOCAL}:${CHROME_FONTS_PATH_DOCKER}"
+      # bashrc 설정 파일 마운트
+      - "${BASHRC_LOCAL}:${BASHRC_DOCKER}"
+      - "${CRONTAB_LOCAL}:${CRONTAB_DOCKER}"
+      # .claude
+      - "${CLAUDE_SETTING_LOCAL}:${CLAUDE_SETTING_DOCKER}"
+      # VSCode 및 Cursor 확장 프로그램 지속성을 위한 볼륨
+      - "${NAS_CURSOR_SERVER_LOCAL}:${NAS_CURSOR_SERVER_DOCKER}"
+      - "${NAS_VSCODE_SERVER_LOCAL}:${NAS_VSCODE_SERVER_DOCKER}"
+
+    stdin_open: true
+    tty: true
+    environment:
+      # SSH 설정
+      - SSH_PORT=22
+      - ROOT_PASSWORD=${SSH_ROOT_PASSWORD}
+
+      # MySQL 설정
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      # PostgreSQL 설정
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+    # 서비스 시작 후 컨테이너 유지
+    command: >
+      /bin/sh -c "
+        /exposed/docker-start.sh &
+        tail -f /dev/null"
+    networks:
+      - dev-network
+
+networks:
+  dev-network:
+    driver: bridge

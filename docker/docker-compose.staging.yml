@@ -1,0 +1,82 @@
+version: '3.8'
+
+# Staging environment overrides
+services:
+  # Auth Service - Staging Mode
+  auth-service:
+    build:
+      context: ../infrastructure/auth-service
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=staging
+    restart: unless-stopped
+
+  # Database Service - Staging Mode
+  database-service:
+    build:
+      context: ../infrastructure/database-service
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=staging
+    restart: unless-stopped
+
+  # API Gateway - Staging Mode
+  api-gateway:
+    build:
+      context: ../infrastructure/api-gateway
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=staging
+    restart: unless-stopped
+
+  # Management Hub Frontend - Staging Mode
+  management-hub-frontend:
+    build:
+      context: ../management-hub/frontend
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=staging
+    restart: unless-stopped
+
+  # Management Hub Backend - Staging Mode
+  management-hub-backend:
+    build:
+      context: ../management-hub/backend
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=staging
+    restart: unless-stopped
+
+  # PostgreSQL with staging settings
+  postgres:
+    environment:
+      - POSTGRES_DB=staging_metadata
+      - POSTGRES_USER=staging_user
+      - POSTGRES_PASSWORD=${POSTGRES_STAGING_PASSWORD}
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # Redis with staging settings
+  redis:
+    volumes:
+      - redis_staging_data:/data
+    restart: unless-stopped
+
+  # Nginx for staging
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/staging.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - api-gateway
+      - management-hub-frontend
+    restart: unless-stopped
+
+volumes:
+  postgres_staging_data:
+  redis_staging_data:
